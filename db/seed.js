@@ -9,13 +9,28 @@ const {
     getUserById
  } = require('./index.js');
 
- const createInitialUser = async () => {
+ const createInitialUsers = async () => {
     try {
         console.log("Starting to create users...");
 
-        await createUser('alice ','bertie97', 'ali','NYC');
-        await createUser('sandra','glamgal', 'sandy', 'OKC');
-        await createUser('benny','bowow', 'ben', 'Portland');
+        await createUser({ 
+            username: 'albert', 
+            password: 'bertie99',
+            name: 'Al Bert',
+            location: 'Sidney, Australia' 
+          });
+          await createUser({ 
+            username: 'sandra', 
+            password: '2sandy4me',
+            name: 'Just Sandra',
+            location: 'Ain\'t tellin\''
+          });
+          await createUser({ 
+            username: 'glamgal',
+            password: 'soglam',
+            name: 'Joshua',
+            location: 'Upper East Side'
+          });
 
     }catch(err){
         console.error("Error creating users!");
@@ -25,23 +40,23 @@ const {
 
  const createInitialPosts = async () => {
     try {
-      const [ alice, sandra, benny ] = await getAllUsers();
-  
-      console.log("Starting to create posts...")
+        const [albert, sandra, glamgal] = await getAllUsers();
+        
+      console.log("Starting to create posts...",sandra)
       await createPost({
-        authorId: alice.id,
+        authorId: albert.id,
         title: "First Post",
         content: "This is my first post. I hope I love writing blogs as much as I love writing them."
       });
   
-      /*await createPost({
+      await createPost({
         authorId: sandra.id,
         title: "How does this work?",
         content: "Seriously, does this even do anything?"
-      });*/
+      });
   
       await createPost({
-        authorId: alice.id,
+        authorId: glamgal.id,
         title: "Living the Glam Life",
         content: "Do you even? I swear that half of you are posing."
       });
@@ -103,8 +118,8 @@ const rebuildDB = async () => {
 
        await dropTables();
        await createTables();
-       createInitialUser();
-       createInitialPosts();
+       await createInitialUsers();
+       await createInitialPosts();
     }catch(err){
         console.error(err)
     }

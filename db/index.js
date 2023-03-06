@@ -3,10 +3,14 @@ const { Client } = require('pg');
 const client = new Client('postgres://localhost:5432/juicebox-dev');
 
 const getAllUsers = async () => {
-    const { rows } = await client.query(
-        `SELECT id, username, name, location, active FROM users;
-        `);
-        return rows;
+      try {
+          const { rows } = await client.query(
+            `SELECT id, username, name, location, active FROM users;
+          `);
+          return rows;
+      }catch(err){
+        throw err;
+      }
 }
 
 const getAllPosts = async () => {
@@ -20,15 +24,16 @@ const getAllPosts = async () => {
     }
 }
 
-const createUser = async (username, password, name, location) => {
+const createUser = async ({username, password, name, location}) => {
     try{
-        const { rows } = await client.query(`
-            INSERT INTO users (username, password, name, location) VALUES ('${username}', '${password}','${name}', '${location}')
-            ON CONFLICT (username) DO NOTHING RETURNING *;
-        `);
+      const { rows: [ user ] } = await client.query(`
+      INSERT INTO users(username, password, name, location) 
+      VALUES($1, $2, $3, $4) 
+      ON CONFLICT (username) DO NOTHING 
+      RETURNING *;
+    `, [username, password, name, location]);
 
-        //console.log(rows);
-        return rows;
+        return user;
     }catch(err){
         throw err;
     }
@@ -46,12 +51,10 @@ const createPost = async ({authorId, title, content}) => {
 }
 
 const updateUser = async (id, fields = {}) => {
-    // build the set string
     const setString = Object.keys(fields).map(
       (key, index) => `"${ key }"=$${ index + 1 }`
     ).join(', ');
   
-    // return early if this is called without fields
     if (setString.length === 0) {
       return;
     }
@@ -71,12 +74,10 @@ const updateUser = async (id, fields = {}) => {
   }
 
   const updatePost = async (id, fields = {}) => {
-    // build the set string
     const setString = Object.keys(fields).map(
         (key, index) => `"${ key }"=$${ index + 1 }`
       ).join(', ');
 
-      // return early if this is called without fields
     if (setString.length === 0) {
         return;
     }
