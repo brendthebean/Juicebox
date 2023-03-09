@@ -11,6 +11,7 @@ const {
     createTags,
     addTagsToPost,
     createPostTag,
+    getAllTags
  } = require('./index.js');
 
  const createInitialUsers = async () => {
@@ -197,6 +198,6 @@ const testDB = async () => {
 }
 
 rebuildDB()
-    .then(testDB)
+    //.then(testDB)
     .catch(console.error)
     .finally(() => client.end);
